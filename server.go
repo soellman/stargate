@@ -100,7 +100,7 @@ func (s Server) Handler(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		// Authorize and redirect new device
+		// Authorize new device
 		s.backend.AddDevice(token.NetworkNames, Device{HardwareAddr: hw})
 		log.Printf("device %s authorized as %s", hw, token.Name)
 
@@ -110,7 +110,8 @@ func (s Server) Handler(w http.ResponseWriter, req *http.Request) {
 			log.Printf("device %s will be removed in %s", hw, token.duration.String())
 		}
 
-		http.Redirect(w, req, "", http.StatusFound)
+		// Redirect to configured page
+		s.Redirect(w, req)
 		return
 
 	default:

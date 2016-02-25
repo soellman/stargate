@@ -1,0 +1,37 @@
+listen: 192.168.1.1   # the local IP address on the managed network
+
+redirect: https://yahoo.com   # redirect URL for successful login
+                              # default https://google.com
+ports:
+  HTTP: 8080          # HTTP listen port:  default is 7676
+  HTTPS: 8443         # HTTPS listen port: default is 7677
+                      # TCP and UDP specify sets of ports on the host
+                      # accessible to the managed network
+  TCP: []             # TCP ports: no default
+  UDP: [ 67,123 ]     # UDP ports: default [ 67 ] (dhcpd)
+
+networks:
+  - name: office
+    network: 10.10.1.0/24
+  - name: securitycams
+    network: 10.10.2.0/24
+  - name: admin
+    network: 10.10.3.0/24
+
+tokens:
+  - name: superadmin
+    keys: [sekritpasswerd, tmpadmin4fred]
+    networks: [office, securitycams, admin]
+    duration: 168h    # durations parsed with time.ParseDuration
+                      # https://golang.org/pkg/time/#ParseDuration
+                      # if a duration is absent, there is no time limit
+  - name: security
+    keys: [secopspass]
+    networks: [securitycams]
+    duration: 48h
+  - name: office
+    keys: [janitor, secretary]
+    networks: [office]
+  - name: open
+    keys: [guess]
+    duration: 120m

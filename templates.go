@@ -104,7 +104,7 @@ func getTemplates() *template.Template {
 
 	<div class="signin">
 	<form method="POST" action="">
-		<label for="password">enter token</label><input type="password" name="key" id="key" size="10" maxlength="30"><br/>
+		<label for="password">enter key</label><input type="password" name="key" id="key" size="10" maxlength="30"><br/>
 		<button type="submit" class="btn">sign in</button>
 	</form>
 	</div>
