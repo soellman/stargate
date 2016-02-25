@@ -1,0 +1,15 @@
+listen: 127.0.0.1
+networks:
+  - name: net1
+    network: 10.10.1.0/24
+  - name: net2
+    network: 10.10.2.0/24
+  - name: net3
+    network: 10.10.3.0/24
+tokens:
+  - name: admin
+    keys: [admin]
+    networks: [net1, net2, net3]
+  - name: office
+    keys: [office1, office2]
+    networks: [net1]
