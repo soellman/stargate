@@ -8,6 +8,7 @@ import (
 	"net"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/mostlygeek/arp"
 )
@@ -69,14 +70,14 @@ func (s Server) Handler(w http.ResponseWriter, req *http.Request) {
 		hw, _ := HardwareAddr(req.RemoteAddr)
 		if s.backend.HWAddrExists(hw) {
 			debugf("redirecting GET from authorized device %s", hw)
-			s.DisplayMessage(w, "you're already logged in")
+			s.DisplayMessage(w, "you are authorized")
 			return
 		}
 		s.templates.ExecuteTemplate(w, "index.html", nil)
 		return
 
 	case "POST":
-		// TODO: instead of unauth, redirect to index with error page
+		// Redirect to error page
 		hw, err := HardwareAddr(req.RemoteAddr)
 		if err != nil {
 			debugf("rejecting request with indeterminate mac: %v", err)
@@ -101,7 +102,13 @@ func (s Server) Handler(w http.ResponseWriter, req *http.Request) {
 
 		// Authorize and redirect new device
 		s.backend.AddDevice(token.NetworkNames, Device{HardwareAddr: hw})
-		log.Printf("authorized %s as %s", hw, token.Name)
+		log.Printf("device %s authorized as %s", hw, token.Name)
+
+		// Defer removal of new device
+		if token.duration != 0 {
+			s.DeferRemoval(Device{HardwareAddr: hw}, token.duration)
+			log.Printf("device %s will be removed in %s", hw, token.duration.String())
+		}
 
 		http.Redirect(w, req, "", http.StatusFound)
 		return
@@ -125,6 +132,14 @@ func (s Server) Token(key string) (t Token, err error) {
 	}
 	err = errors.New("no token found")
 	return
+}
+
+// DeferRemoval will remove the specified device after a duration
+func (s Server) DeferRemoval(device Device, duration time.Duration) {
+	go time.AfterFunc(duration, func() {
+		s.backend.RemoveDevice(device)
+		log.Printf("device %s removed", device.HardwareAddr)
+	})
 }
 
 // HardwareAddr returns the mac addr for a local IP, or an error

@@ -159,7 +159,7 @@ func (b *IPTablesBackend) AddNetwork(network Network) {
 	b.ipt.AppendUnique("filter", "FORWARD", "-s", b.config.net, "-d", network.String(), "-j", "access_"+network.Name)
 	b.ipt.AppendUnique("filter", "FORWARD", "-s", b.config.net, "-d", network.String(), "-j", "DROP")
 
-	debugf("added network %s", network.Name)
+	debugf("network %s added", network.Name)
 }
 
 // RemoveNetwork fulfills the Networks interface
@@ -179,7 +179,7 @@ func (b *IPTablesBackend) RemoveNetwork(network Network) {
 	b.ipt.ClearChain("filter", "access_"+network.Name)
 	b.ipt.DeleteChain("filter", "access_"+network.Name)
 
-	debugf("removed network %s", network.Name)
+	debugf("network %s removed", network.Name)
 }
 
 // AddDevice fulfills the Device interface
@@ -208,9 +208,9 @@ func (b *IPTablesBackend) RemoveDevice(device Device) {
 	}
 	b.devices = devices
 
-	b.ipt.Delete("mangle", "captive_allowed", "-m", "mac", "--mac-source", device.HardwareAddr.String(), "-j", "RETURN")
+	b.ipt.Delete("mangle", "captive_allowed", "-m", "mac", "--mac-source", device.HardwareAddr.String(), "-j", "ACCEPT")
 	for _, n := range b.networks {
-		b.ipt.Delete("filter", "access_"+n.Name, "-m", "mac", "--mac-source", device.HardwareAddr.String(), "-j", "RETURN")
+		b.ipt.Delete("filter", "access_"+n.Name, "-m", "mac", "--mac-source", device.HardwareAddr.String(), "-j", "ACCEPT")
 	}
 
 	debugf("removed device %s", device.HardwareAddr.String())
