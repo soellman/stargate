@@ -25,3 +25,10 @@ Start it up (e.g. `nohup sudo stargate`). You'll need to run as root - it requir
 - It logs to stdout, redirect as you please.
 - When you stop stargate, it will remove all access from the managed network
 - Logging in only provides access until the token expires or stargate is stopped/restarted
+
+## Security
+
+Stargate is NOT professional-grade security. Use at your own risk.
+
+- Stargate is susceptible to DNS tunneling
+- Stargate doesn't support SSL and login traffic can be sniffed
